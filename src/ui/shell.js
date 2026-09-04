@@ -1,0 +1,9 @@
+import { UI, text } from '../data/ui.js';
+import { PORTS } from '../data/catalog.js';
+import { icon, art, button, number, dayLabel } from './components.js';
+
+export function renderShell(state, d, ui, content) {
+  const current=state.portId?PORTS[state.portId].name:state.voyage?text('underway',{port:PORTS[state.voyage.to].name}):UI.lost;
+  const resources=[['coin',UI.gold,number(state.gold)],['star',UI.reputation,number(state.reputation)],['crew',UI.sailors,`${d.sailors}/${d.maxSailors}`]];
+  return `<div class="app-layout"><aside class="sidebar">${art('assets/emblem.svg',UI.title,'brand-emblem')}<nav aria-label="${UI.title}">${UI.nav.map(item=>`<button class="nav-button ${ui.view===item.id?'active':''}" data-action="view" data-view="${item.id}" ${ui.view===item.id?'aria-current="page"':''}>${icon(item.icon)}<span>${item.name}</span></button>`).join('')}</nav><div class="sidebar-bottom"><button data-action="guide" aria-label="${UI.guide}" title="${UI.guide}">${icon('info')}</button><button data-action="settings" aria-label="${UI.settings}" title="${UI.settings}">${icon('save')}</button></div></aside><main class="app-main"><header class="topbar"><div class="wordmark"><strong>${UI.title}</strong><span>${UI.subtitle}</span></div><div class="resources">${resources.map(([symbol,label,value])=>`<div class="resource">${icon(symbol)}<div><span>${label}</span><strong>${value}</strong></div></div>`).join('')}<div class="game-date">${UI.date} · ${dayLabel(state.day)}<strong>${icon(state.portId?'anchor':'ship')} ${current}</strong></div></div></header><div class="content">${content}<footer class="footer"><span>${icon(ui.saveAvailable?'check':'info')}${ui.saveAvailable?UI.saved:UI.saveError}</span><span>${UI.edition} · ${dayLabel(state.day)}</span><div class="mobile-tools">${button(UI.guide,'guide',{},'ghost tiny')}${button(UI.settings,'settings',{},'ghost tiny')}</div></footer></div></main></div>`;
+}

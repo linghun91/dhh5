@@ -1,0 +1,182 @@
+:root {
+  color-scheme:dark;
+  --bg:#101b21;
+  --panel:#17262d;
+  --panel-raised:#1b2d34;
+  --line:#ffffff12;
+  --line-gold:#bca36b38;
+  --text:#e8e7df;
+  --muted:#91a0a3;
+  --gold:#d7b878;
+  --green:#7fbca4;
+  --red:#dc887c;
+  --blue:#81b3c6;
+  --serif:Georgia,'Noto Serif CJK SC','Songti SC',SimSun,serif;
+  --sans:Inter,'Noto Sans CJK SC','Microsoft YaHei',system-ui,sans-serif;
+  font-family:var(--sans);
+  font-size:14px;
+  background:var(--bg);
+  color:var(--text);
+}
+
+* {
+  box-sizing:border-box;
+}
+
+body {
+  margin:0;
+}
+
+button,input,select {
+  font:inherit;
+}
+
+button,a,input,select {
+  -webkit-tap-highlight-color:transparent;
+}
+
+button {
+  cursor:pointer;
+}
+
+button:disabled {
+  cursor:not-allowed;
+  opacity:.4;
+}
+
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible {
+  outline:2px solid var(--gold);
+  outline-offset:4px;
+}
+
+button {
+  color:inherit;
+}
+
+a {
+  color:var(--gold);
+  text-decoration:none;
+}
+
+h1,h2,h3,p {
+  margin:0;
+}
+
+h1,h2,h3 {
+  font-weight:500;
+}
+
+h1,h2 {
+  font-family:var(--serif);
+}
+
+h1 {
+  font-size:31px;
+  letter-spacing:4px;
+}
+
+h2 {
+  font-size:24px;
+  letter-spacing:2px;
+}
+
+h3 {
+  font-size:14px;
+  letter-spacing:1px;
+}
+
+p {
+  line-height:1.8;
+}
+
+img {
+  max-width:100%;
+  display:block;
+}
+
+small {
+  font-size:11px;
+  color:var(--muted);
+}
+
+select,input {
+  background:#0d1c23;
+  border:1px solid #496067;
+  color:var(--text);
+  border-radius:4px;
+  padding:9px 10px;
+  max-width:100%;
+}
+
+select {
+  width:100%;
+}
+
+input[type=number] {
+  width:70px;
+}
+
+option {
+  background:#17262d;
+}
+
+::selection {
+  background:#d7b87840;
+}
+
+::-webkit-scrollbar {
+  width:5px;
+  height:5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background:#5d6f70;
+  border-radius:4px;
+}
+
+.icon {
+  width:20px;
+  height:20px;
+  flex-shrink:0;
+  vertical-align:middle;
+}
+
+.muted {
+  color:var(--muted);
+}
+
+.gold {
+  color:var(--gold);
+}
+
+.green {
+  color:var(--green);
+}
+
+.red {
+  color:var(--red);
+}
+
+.small {
+  font-size:12px;
+}
+
+.eyebrow {
+  color:var(--gold);
+  font-family:Georgia,serif;
+  font-size:10px;
+  letter-spacing:3px;
+}
+
+.art {
+  object-fit:contain;
+}
+
+.visually-hidden {
+  position:absolute;
+  width:1px;
+  height:1px;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+}

@@ -1,0 +1,15 @@
+export const PORT_UI = {
+  arrival: 'PORT OF CALL', actions: '交易指令', unitCost: '单位成本', unitProfit: '预计单位盈亏',
+  tradeQuantity: '交易数量', purchaseQuantity: '购买数量', sailorQuantity: '招募人数',
+  marketStock: '市场与持仓', resupply: '补给采购', fleetService: '舰队整备',
+  contractActive: '商贸合约生效中，可以买入当地库存。',
+  shipyardSub: '从第一面帆，到一支足以穿越七海的舰队。',
+  shipyardHint: '挑选新船，改良帆装与装甲，或重新安排有限的船舱。',
+  openFleet: '选购与管理舰船', openCabins: '调整船舱配置',
+  shareHint: '投资提升当地份额，也会计入本海域的信物进度。',
+  visitProgress: '已访问 / 所需港口', influenceProgress: '地区份额 / 所需份额',
+  ruinsHint: '探索当地遗迹，寻找散落在古老港口中的航海线索。',
+  noActiveQuests: '尚未承接委托。', deliverAt: '前往目的港交付',
+  cargoLoad: '已用货舱',
+  noCost: '—', separator: ' / ', percent: '%', plus: '+',
+};
