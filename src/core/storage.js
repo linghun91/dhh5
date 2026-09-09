@@ -1,5 +1,5 @@
 import { createGame, derive } from './game.js';
-import { PORTS, REGIONS, SHIP_TYPES, CABINS, GOODS, CREW, EQUIPMENT, EVENTS, ROLES } from '../data/catalog.js';
+import { PORTS, REGIONS, SHIP_TYPES, CABINS, CANNONS, GOODS, CREW, EQUIPMENT, EVENTS, ROLES } from '../data/catalog.js';
 
 const key='seven-seas-expedition';
 const finite=(n,min=0,max=1e12)=>typeof n==='number'&&Number.isFinite(n)&&n>=min&&n<=max;
@@ -12,13 +12,14 @@ const reference=(value,catalog)=>typeof value==='string'&&Object.hasOwn(catalog,
 const record=(value,check)=>plain(value)&&Object.entries(value).every(([id,item])=>check(id,item));
 const idList=(value,catalog)=>list(value,Object.keys(catalog).length)&&unique(value)&&value.every(id=>reference(id,catalog));
 
-export function validateSave(s) {
+function validateState(s) {
   if(!plain(s)||s.version!==1||Object.keys(s).sort().join()!==Object.keys(createGame()).sort().join())return false;
   if(!integer(s.seed,0,4294967295)||!integer(s.day,1)||!integer(s.nextShipId,2)||!['playing','won','lost'].includes(s.status))return false;
   if(!['gold','reputation','questCount','battlesWon'].every(k=>integer(s[k]))||!finite(s.tradeProfit,-1e12)||!finite(s.fatigue,0,100)||!finite(s.morale,0,100))return false;
   if(!(s.portId===null||reference(s.portId,PORTS))||!(s.ending===null||safeText(s.ending)))return false;
   if(!list(s.fleet,5)||(s.status!=='lost'&&!s.fleet.length)||!unique(s.fleet.map(x=>x.id)))return false;
-  if(!s.fleet.every(ship=>plain(ship)&&/^ship-\d+$/.test(ship.id)&&reference(ship.type,SHIP_TYPES)&&safeText(ship.name,70)&&integer(ship.sails,0,3)&&integer(ship.armor,0,3)&&finite(ship.hull,0,SHIP_TYPES[ship.type].hull+ship.armor*45)&&integer(ship.sailors)&&list(ship.cabins,10)&&ship.cabins.length===SHIP_TYPES[ship.type].slots&&ship.cabins.every(id=>reference(id,CABINS))))return false;
+  if(!s.fleet.every(ship=>plain(ship)&&/^ship-\d+$/.test(ship.id)&&reference(ship.type,SHIP_TYPES)&&safeText(ship.name,70)&&integer(ship.sails,0,3)&&integer(ship.armor,0,3)&&finite(ship.hull,0,SHIP_TYPES[ship.type].hull+ship.armor*45)&&integer(ship.sailors)&&list(ship.cabins,SHIP_TYPES[ship.type].slots)&&ship.cabins.length===SHIP_TYPES[ship.type].slots&&ship.cabins.every(id=>reference(id,CABINS))))return false;
+  if(!s.fleet.every(ship=>!Object.hasOwn(ship,'cannons')||(list(ship.cannons,ship.cabins.length)&&ship.cannons.length===ship.cabins.length&&ship.cannons.every((id,slot)=>ship.cabins[slot]==='cannon'?reference(id,CANNONS)&&CANNONS[id].weight<=SHIP_TYPES[ship.type].maxGunWeight:id===null))))return false;
   if(!record(s.cargo,(id,item)=>reference(id,GOODS)&&plain(item)&&integer(item.quantity,1)&&finite(item.cost)))return false;
   if(!plain(s.supplies)||Object.keys(s.supplies).sort().join()!=='ammo,food,repair,water'||!Object.values(s.supplies).every(n=>integer(n)))return false;
   if(!list(s.crew,8)||!unique(s.crew.map(c=>c.id))||s.crew.filter(c=>c.role==='captain').length!==1)return false;
@@ -38,16 +39,25 @@ export function validateSave(s) {
   if(s.event!==null&&(!plain(s.event)||!reference(s.event.id,EVENTS)||!s.voyage||s.portId!==null))return false;
   if(s.combat!==null) {
     const c=s.combat;
-    if(!plain(c)||!s.voyage||s.portId!==null||s.event||!safeText(c.name,80)||!reference(c.regionId,REGIONS)||!integer(c.round,1)||!['hull','maxHull','sailors','maxSailors','firepower','reward'].every(k=>integer(c[k]))||c.hull>c.maxHull||c.sailors>c.maxSailors)return false;
+    if(!plain(c)||!s.voyage||s.portId!==null||s.event||!safeText(c.name,80)||!reference(c.regionId,REGIONS)||!integer(c.round,1)||!['hull','maxHull','sailors','maxSailors','firepower','reward'].every(k=>integer(c[k]))||c.hull>c.maxHull||c.sailors>c.maxSailors||(Object.hasOwn(c,'range')&&!['close','medium','long'].includes(c.range)))return false;
   }
   const stats=derive(s);
   return stats.cargoUsed<=stats.cargoCapacity&&stats.supplyUsed<=stats.supplyCapacity&&s.fleet.every((ship,i)=>ship.sailors<=stats.ships[i].maxSailors);
 }
 
+export function validateSave(state) {
+  try {return validateState(state);}
+  catch {return false;}
+}
+
 export function parseSave(raw) {
-  if(raw.length>262144)throw new Error('invalid-save');
+  if(typeof raw!=='string'||raw.length>262144)throw new Error('invalid-save');
   const state=JSON.parse(raw);
   if(!validateSave(state))throw new Error('invalid-save');
+  for (const ship of state.fleet) {
+    if (!Object.hasOwn(ship,'cannons')) ship.cannons=ship.cabins.map(id=>id==='cannon'?SHIP_TYPES[ship.type].defaultCannon:null);
+  }
+  if (state.combat&&!Object.hasOwn(state.combat,'range')) state.combat.range='medium';
   return state;
 }
 export function loadGame() {

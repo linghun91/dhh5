@@ -21,18 +21,12 @@ export const GOODS = keyed([
 export const CABINS = keyed([
   {id:'cargo',name:'货仓',price:350,cargo:60,supply:0,firepower:0,marines:0,kitchen:0,medicine:0,description:'增加 60 单位商品容量。'},
   {id:'supply',name:'物资舱',price:300,cargo:0,supply:80,firepower:0,marines:0,kitchen:0,medicine:0,description:'增加 80 单位粮水、炮弹与维修材容量。'},
-  {id:'cannon',name:'炮台',price:700,cargo:0,supply:0,firepower:18,marines:0,kitchen:0,medicine:0,description:'增加 18 基础火力，炮击消耗弹药。'},
+  {id:'cannon',name:'炮台',price:700,cargo:0,supply:0,firepower:0,marines:0,kitchen:0,medicine:0,description:'新建炮台需支付 700 施工费及该船默认火炮全价；建成即装炮，火力、射程与弹耗取决于炮型。'},
   {id:'marine',name:'水兵室',price:550,cargo:0,supply:0,firepower:0,marines:22,kitchen:0,medicine:0,description:'增加 22 白刃战力与 12 名水手上限。'},
   {id:'kitchen',name:'厨房',price:400,cargo:0,supply:0,firepower:0,marines:0,kitchen:1,medicine:0,description:'每艘设厨房的船使舰队粮食消耗降低，最多 40%。'},
   {id:'infirmary',name:'医务室',price:650,cargo:0,supply:0,firepower:0,marines:0,kitchen:0,medicine:1,description:'减少疾病伤亡，降低疲劳增长。'}
 ],'cabins');
-export const SHIP_TYPES = keyed([
-  {id:'caravel',name:'轻快帆船',price:6500,hull:160,sailors:40,speed:24,slots:6,cabins:['cargo','cargo','supply','supply','cannon','kitchen'],description:'吃水浅、航速快，适合初期贸易与探索。'},
-  {id:'carrack',name:'大型商船',price:12500,hull:260,sailors:65,speed:20,slots:8,cabins:['cargo','cargo','cargo','supply','supply','cannon','kitchen','infirmary'],description:'宽阔货仓与坚固船体适合远洋商队。'},
-  {id:'galleon',name:'盖伦战舰',price:22000,hull:380,sailors:85,speed:18,slots:10,cabins:['cargo','cargo','supply','supply','supply','cannon','cannon','cannon','marine','kitchen'],description:'厚实船体与多层火炮组成海上堡垒。'},
-  {id:'frigate',name:'快速护卫舰',price:27000,hull:290,sailors:70,speed:29,slots:8,cabins:['cargo','supply','supply','cannon','cannon','marine','kitchen','infirmary'],description:'速度与火力兼顾，擅长护航和追击。'},
-  {id:'junk',name:'远洋福船',price:16000,hull:280,sailors:60,speed:23,slots:9,cabins:['cargo','cargo','cargo','supply','supply','cannon','marine','kitchen','infirmary'],description:'水密隔舱与灵活帆装构成均衡的远洋船。'}
-],'ships');
+export {SHIP_TYPES,CANNONS,NAVAL_NOTES} from './naval.js';
 export const CREW = keyed([
   {id:'alvaro',name:'阿尔瓦罗',title:'远征船长',portId:'lisbon',price:0,navigation:55,trade:38,combat:48,medicine:18,description:'继承旧海图的年轻船长，决心收集七海的航海信物。'},
   {id:'ines',name:'伊内斯',title:'星象领航员',portId:'lisbon',price:1200,navigation:78,trade:35,combat:23,medicine:30,description:'相信星辰与数字，一次次把船队带回正确航线。'},
@@ -63,7 +57,7 @@ export const FACILITIES = keyed([
 export const SUPPLIES = keyed([
   {id:'food',name:'食物',price:3,description:'每日消耗，厨房降低用量。'},
   {id:'water',name:'淡水',price:2,description:'每日消耗，缺水导致严重减员。'},
-  {id:'ammo',name:'炮弹',price:12,description:'炮击时按舰船数量消耗。'},
+  {id:'ammo',name:'炮弹',price:12,description:'齐射按所装炮组耗弹；各船炮组弹耗相加后向上取整。'},
   {id:'repair',name:'维修材',price:15,description:'暴风加固和海战抢修时使用。'}
 ],'supplies');
 export const ROLES = {captain:'船长',navigator:'领航员',accountant:'主计长',gunner:'炮术长',doctor:'船医'};

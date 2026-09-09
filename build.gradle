@@ -18,6 +18,10 @@ tasks.register('verifyResources') {
     }
 }
 
+tasks.register('verifyNaval', Exec) {
+    commandLine 'node', 'scripts/verify-naval.js'
+}
+
 tasks.register('site', Sync) {
     dependsOn 'verifyResources'
     from('.') {
@@ -33,5 +37,5 @@ tasks.register('distribution', Zip) {
     destinationDirectory = layout.buildDirectory.dir('distributions')
 }
 
-check.dependsOn 'verifyResources'
+check.dependsOn 'verifyResources', 'verifyNaval'
 assemble.dependsOn 'distribution'

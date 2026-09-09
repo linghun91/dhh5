@@ -127,3 +127,25 @@
 !/styles/components.css
 !/styles/layout.css
 !/styles/scenes.css
+
+# 舰船图鉴、逐炮台配装与运行校验。
+!/assets/cannons/
+!/src/data/naval.js
+!/src/ui/naval.js
+!/styles/naval.css
+!/scripts/verify-naval.js
+!/assets/cannons/culverin.svg
+!/assets/cannons/long-32.svg
+!/assets/cannons/long-18.svg
+!/assets/cannons/long-24.svg
+!/assets/cannons/demi-cannon.svg
+!/assets/cannons/long-9.svg
+!/assets/cannons/carronade-32.svg
+!/assets/cannons/swivel.svg
+!/assets/ships/sloop.svg
+!/assets/ships/brig.svg
+!/assets/ships/sixth-rate.svg
+!/assets/ships/fourth-rate.svg
+!/assets/ships/third-rate.svg
+!/assets/ships/second-rate.svg
+!/assets/ships/first-rate.svg

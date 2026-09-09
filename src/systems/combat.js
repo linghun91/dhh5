@@ -1,13 +1,13 @@
 import {PORTS,REGIONS} from '../data/catalog.js';
 import {message} from '../data/messages.js';
-import {getStats,shipStats} from './stats.js';
+import {getStats,shipStats,getVolley} from './stats.js';
 import {random,fail,success,addLog,gainExperience} from './common.js';
 import {damageFleet,loseSailors,resolveLosses} from './time.js';
 
 export function beginCombat(state) {
   const regionId=PORTS[state.voyage.from].region,danger=REGIONS[regionId].danger;
   const hull=85+danger*30,sailors=20+danger*9;
-  state.combat={name:message('pirateName'),hull,maxHull:hull,sailors,maxSailors:sailors,firepower:9+danger*4,round:1,reward:750+danger*400,regionId};
+  state.combat={name:message('pirateName'),hull,maxHull:hull,sailors,maxSailors:sailors,firepower:9+danger*4,round:1,reward:750+danger*400,regionId,range:'medium'};
   return success(state,'combatStart',{},'warn');
 }
 function victory(state) {
@@ -28,17 +28,27 @@ function victory(state) {
 }
 export function battle(state,{move}) {
   if (!state.combat) return fail('noCombat');
-  if (!['cannon','board','guard','flee','repair'].includes(move)) return fail('invalid');
-  if (move==='cannon'&&state.supplies.ammo<state.fleet.length) return fail('ammo');
+  if (!['cannon','board','guard','flee','repair','approach','withdraw'].includes(move)) return fail('invalid');
+  const range=state.combat.range||'medium',ranges=['close','medium','long'];
+  const volley=getVolley(state,range);
+  if (move==='cannon'&&!volley.ammo) return fail('noCannons');
+  if (move==='cannon'&&state.supplies.ammo<volley.ammo) return fail('ammo');
+  if (move==='board'&&range!=='close') return fail('boardRange');
+  if ((move==='approach'&&range==='close')||(move==='withdraw'&&range==='long')) return fail('rangeLimit');
   if (move==='repair'&&state.supplies.repair<3) return fail('notEnoughSupplies');
   if (move==='repair'&&state.fleet.every(ship=>ship.hull===shipStats(ship).maxHull)) return fail('full');
   const stats=getStats(state),enemy=state.combat;
   let key,values={},guard=1;
   if (move==='cannon') {
-    state.supplies.ammo-=state.fleet.length;
-    const damage=Math.max(1,Math.round(stats.firepower*(.85+random(state)*.45)));
+    state.supplies.ammo-=volley.ammo;
+    const damage=Math.max(1,Math.round(volley.firepower*(.85+random(state)*.45)));
     enemy.hull=Math.max(0,enemy.hull-damage);
-    key='battleCannon';values={damage};
+    key='battleCannon';values={damage,ammo:volley.ammo};
+  }
+  if (move==='approach'||move==='withdraw') {
+    enemy.range=ranges[ranges.indexOf(range)+(move==='approach'?-1:1)];
+    key=move==='approach'?'battleApproach':'battleWithdraw';
+    values={range:{close:'近距离',medium:'中距离',long:'远距离'}[enemy.range]};
   }
   if (move==='board') {
     const damage=Math.max(2,Math.round(stats.boarding*(.55+random(state)*.35)));

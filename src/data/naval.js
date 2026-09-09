@@ -1,0 +1,31 @@
+// Historical identities follow the Royal Museums Greenwich rating guide.
+// Slots, crew complements, prices and weapon performance are game abstractions.
+const keyed=(rows,folder)=>Object.fromEntries(rows.map(row=>[row.id,{...row,asset:`assets/${folder}/${row.id}.svg`}]));
+
+export const CANNONS=keyed([
+  {id:'swivel',name:'旋回小炮',price:450,firepower:8,range:'close',weight:1,ammoCost:.25,boarding:10,era:'16—18 世纪',shot:'小型散弹炮',description:'舷缘叉架上的轻型旋回炮，擅长近距离压制甲板与支援接舷，远射弱。'},
+  {id:'culverin',name:'长身蛇炮',price:850,firepower:18,range:'long',weight:2,ammoCost:.5,boarding:0,era:'16—17 世纪',shot:'早期长炮型号',description:'大航海时代常见的长身炮。蛇炮名称随地区与时期而变，本作取长身远射特点。'},
+  {id:'demi-cannon',name:'半加农炮',price:1500,firepower:29,range:'medium',weight:4,ammoCost:.9,boarding:2,era:'16—17 世纪',shot:'早期重炮型号',description:'早期重型半加农炮，炮身较蛇炮粗短，以沉重弹丸破坏船体，需较强船体承重。'},
+  {id:'long-9',name:'9 磅长炮',price:800,firepower:16,range:'long',weight:2,ammoCost:.4,boarding:0,era:'18 世纪后期',shot:'9 磅实心弹',description:'轻型巡航舰常见的长炮，弹耗低，适合侦察舰与远距牵制；磅数指炮弹重量。'},
+  {id:'long-18',name:'18 磅长炮',price:1350,firepower:23,range:'long',weight:3,ammoCost:.65,boarding:0,era:'18 世纪后期',shot:'18 磅实心弹',description:'重型护卫舰的代表主炮，在威力与承重之间取得平衡，也可用于战列舰上层。'},
+  {id:'long-24',name:'24 磅长炮',price:1800,firepower:29,range:'long',weight:4,ammoCost:.85,boarding:0,era:'18 世纪后期',shot:'24 磅实心弹',description:'适合较大军舰炮甲板的重型长炮，远距火力强，需要更多弹药和承重。'},
+  {id:'long-32',name:'32 磅长炮',price:2400,firepower:35,range:'long',weight:5,ammoCost:1.15,boarding:0,era:'18 世纪后期',shot:'32 磅实心弹',description:'大型战列舰下层炮甲板的重炮。最强远射火力，承重与弹耗也最高。'},
+  {id:'carronade-32',name:'32 磅卡隆炮',price:1650,firepower:30,range:'close',weight:3,ammoCost:.8,boarding:8,era:'18 世纪后期',shot:'32 磅炮弹',description:'短身轻量的近战舰炮，以较低承重发射重弹，贴近敌舰时威力突出，远距离明显乏力。'}
+],'cannons');
+
+export const SHIP_TYPES=keyed([
+  {id:'caravel',name:'卡拉维尔轻快帆船',family:'exploration',rate:0,ratedGuns:0,gunDecks:0,era:'15—16 世纪',role:'沿岸探索 · 灵活贸易',maxGunWeight:2,defaultCannon:'culverin',price:6500,hull:160,sailors:40,speed:24,slots:6,cabins:['cargo','cargo','supply','supply','cannon','kitchen'],description:'浅吃水与灵活帆装适合早期远航探索。两间货仓便于贸易，船体仅能承担轻型火炮。'},
+  {id:'carrack',name:'卡拉克大型商船',family:'merchant',rate:0,ratedGuns:0,gunDecks:1,era:'15—16 世纪',role:'远洋贸易 · 长途补给',maxGunWeight:3,defaultCannon:'culverin',price:12500,hull:260,sailors:65,speed:20,slots:8,cabins:['cargo','cargo','cargo','supply','supply','cannon','kitchen','infirmary'],description:'高艏艉楼与宽阔船腹是早期远洋商船的特征。货仓充裕，适合携带商品和补给。'},
+  {id:'galleon',name:'盖伦战舰',family:'line',rate:0,ratedGuns:0,gunDecks:2,era:'16—17 世纪',role:'武装远航 · 重炮护航',maxGunWeight:4,defaultCannon:'demi-cannon',price:22000,hull:380,sailors:85,speed:18,slots:10,cabins:['cargo','cargo','supply','supply','supply','cannon','cannon','cannon','marine','kitchen'],description:'较低艏楼、细长船体和多层侧舷炮构成早期远洋战舰。属于评级体系普及前的船型，不等同后期一级舰。'},
+  {id:'junk',name:'远洋福船',family:'merchant',rate:0,ratedGuns:0,gunDecks:1,era:'16—17 世纪',role:'东方贸易 · 均衡远航',maxGunWeight:3,defaultCannon:'culverin',price:16000,hull:280,sailors:60,speed:23,slots:9,cabins:['cargo','cargo','cargo','supply','supply','cannon','marine','kitchen','infirmary'],description:'东方海船的水密隔舱与带帆骨的帆装，兼顾货运、续航与护卫；不采用英国海军评级。'},
+  {id:'sloop',name:'单桅巡逻帆船',family:'cruiser',rate:0,ratedGuns:0,gunDecks:1,era:'18 世纪',role:'快速侦察 · 近岸巡逻',maxGunWeight:2,defaultCannon:'swivel',price:4200,hull:115,sailors:28,speed:31,slots:5,cabins:['cargo','supply','supply','cannon','kitchen'],description:'本作取单桅小型巡逻帆船样式，造价与船员消耗低，航速最高。历史上的 sloop-of-war 是职务类别，帆装并不限于单桅。'},
+  {id:'brig',name:'双桅横帆军舰',family:'cruiser',rate:0,ratedGuns:0,gunDecks:1,era:'18 世纪',role:'海岸护航 · 轻装追击',maxGunWeight:3,defaultCannon:'long-9',price:10500,hull:205,sailors:48,speed:28,slots:7,cabins:['cargo','supply','supply','cannon','cannon','marine','kitchen'],description:'两根横帆桅杆易于辨认，是轻型护航与巡航的实用船型。可换装轻量卡隆炮强化近战。'},
+  {id:'sixth-rate',name:'六级护卫舰',family:'cruiser',rate:6,ratedGuns:28,gunDecks:1,era:'18 世纪后期',role:'轻型巡航 · 商路护卫',maxGunWeight:3,defaultCannon:'long-9',price:18500,hull:255,sailors:60,speed:30,slots:8,cabins:['cargo','supply','supply','cannon','cannon','marine','kitchen','infirmary'],description:'以 28 炮小型护卫舰为代表，主炮布置在单层炮甲板。速度快、服役成本较低，承担巡逻而非战列线作战。'},
+  {id:'frigate',name:'五级护卫舰',family:'cruiser',rate:5,ratedGuns:38,gunDecks:1,era:'18 世纪后期',role:'远洋巡航 · 快速截击',maxGunWeight:3,defaultCannon:'long-18',price:27000,hull:290,sailors:70,speed:29,slots:8,cabins:['cargo','supply','supply','cannon','cannon','marine','kitchen','infirmary'],description:'以 38 炮护卫舰为代表，单层主炮甲板配备 18 磅长炮。用于舰队侦察、护航与独立巡航，不属于战列舰。'},
+  {id:'fourth-rate',name:'四级双层军舰',family:'line',rate:4,ratedGuns:50,gunDecks:2,era:'18 世纪后期',role:'远站旗舰 · 重型护航',maxGunWeight:4,defaultCannon:'long-24',price:35000,hull:440,sailors:105,speed:21,slots:10,cabins:['cargo','supply','supply','supply','cannon','cannon','cannon','marine','kitchen','infirmary'],description:'以 50 炮双层舰为代表。18 世纪末已不适合主力战列线，转任海外旗舰与护航；游戏中兼顾耐久、补给和重炮。'},
+  {id:'third-rate',name:'三级战列舰',family:'line',rate:3,ratedGuns:74,gunDecks:2,era:'18 世纪后期',role:'战列线主力 · 全能重舰',maxGunWeight:5,defaultCannon:'long-32',price:52000,hull:600,sailors:145,speed:20,slots:12,cabins:['cargo','supply','supply','supply','cannon','cannon','cannon','cannon','marine','marine','kitchen','infirmary'],description:'74 炮双层舰是后期帆船战列线的主力，在火力、造价与航行性能之间取得平衡。支持全部炮型与灵活混装。'},
+  {id:'second-rate',name:'二级战列舰',family:'line',rate:2,ratedGuns:98,gunDecks:3,era:'18 世纪后期',role:'海外旗舰 · 持久炮战',maxGunWeight:5,defaultCannon:'long-32',price:72000,hull:760,sailors:170,speed:16,slots:14,cabins:['cargo','supply','supply','supply','supply','cannon','cannon','cannon','cannon','cannon','marine','marine','kitchen','infirmary'],description:'以 98 炮三层舰为代表，比一级舰便宜，适合作海外旗舰。厚重船体与大补给舱换来较低的航速。'},
+  {id:'first-rate',name:'一级战列舰',family:'line',rate:1,ratedGuns:100,gunDecks:3,era:'18 世纪后期',role:'舰队旗舰 · 火力核心',maxGunWeight:5,defaultCannon:'long-32',price:98000,hull:920,sailors:195,speed:17,slots:16,cabins:['cargo','supply','supply','supply','supply','cannon','cannon','cannon','cannon','cannon','cannon','marine','marine','marine','kitchen','infirmary'],description:'以胜利号式 100 炮三层旗舰为代表，拥有最大耐久和改装空间。一级也包括更多炮数的舰型；本作水手人数经过缩编。'}
+],'ships');
+
+export const NAVAL_NOTES='本作跨 15—18 世纪收录船炮，并允许跨时代混装。舰级采用英国海军晚 18 世纪代表制式；额定炮数是史实名义数量，每个炮台槽代表抽象炮组，不与实炮一一对应。磅数表示炮弹重量，并非炮口直径。承重、火力、价格与缩编船员均为游戏数值。';

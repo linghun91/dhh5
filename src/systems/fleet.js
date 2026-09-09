@@ -1,11 +1,11 @@
-import {CABINS,SHIP_TYPES} from '../data/catalog.js';
+import {CABINS,SHIP_TYPES,CANNONS} from '../data/catalog.js';
 import {message} from '../data/messages.js';
 import {fail,positive,success} from './common.js';
 import {getStats,shipStats} from './stats.js';
 
 export function createShip(type,id) {
   const data=SHIP_TYPES[type];
-  return {id:`ship-${id}`,type,name:message('shipName',{name:data.name,number:id}),hull:data.hull,sailors:Math.ceil(data.sailors*.6),cabins:[...data.cabins],sails:0,armor:0};
+  return {id:`ship-${id}`,type,name:message('shipName',{name:data.name,number:id}),hull:data.hull,sailors:Math.ceil(data.sailors*.6),cabins:[...data.cabins],cannons:data.cabins.map(cabin=>cabin==='cannon'?data.defaultCannon:null),sails:0,armor:0};
 }
 export const repairCost = state => Math.ceil(state.fleet.reduce((sum,ship)=>sum+shipStats(ship).maxHull-ship.hull,0)*3);
 export function repair(state) {
@@ -54,16 +54,34 @@ export function sellShip(state,{shipId}) {
   state.gold+=cost;
   return success(state,'sellShip',{name:ship.name,cost});
 }
+// New batteries pay for construction and their included weapon; ship purchases already include it.
+export const cabinCost=(ship,cabinId)=>CABINS[cabinId].price+(cabinId==='cannon'?CANNONS[SHIP_TYPES[ship.type].defaultCannon].price:0);
 export function cabin(state,{shipId,slot,cabinId}) {
   const ship=state.fleet.find(item=>item.id===shipId),next=CABINS[cabinId];
   if (!ship||!next||!Number.isInteger(slot)||slot<0||slot>=ship.cabins.length) return fail('invalid');
   if (ship.cabins[slot]===cabinId) return fail('same');
   const previous=CABINS[ship.cabins[slot]],stats=getStats(state),own=shipStats(ship);
   if (stats.cargoUsed>stats.cargoCapacity-previous.cargo+next.cargo||stats.supplyUsed>stats.supplyCapacity-previous.supply+next.supply||ship.sailors>own.maxSailors-(previous.marines?12:0)+(next.marines?12:0)) return fail('overload');
-  if (state.gold<next.price) return fail('funds',{cost:next.price});
-  state.gold-=next.price;
+  const cost=cabinCost(ship,cabinId);
+  if (state.gold<cost) return fail('funds',{cost});
+  if (!ship.cannons) ship.cannons=ship.cabins.map(id=>id==='cannon'?SHIP_TYPES[ship.type].defaultCannon:null);
+  state.gold-=cost;
   ship.cabins[slot]=cabinId;
-  return success(state,'cabin',{ship:ship.name,name:next.name});
+  ship.cannons[slot]=cabinId==='cannon'?SHIP_TYPES[ship.type].defaultCannon:null;
+  return success(state,'cabin',{ship:ship.name,name:next.name,cost});
+}
+export function armCannon(state,{shipId,slot,cannonId}) {
+  const ship=state.fleet.find(item=>item.id===shipId),next=CANNONS[cannonId];
+  if (!ship||!next||!Number.isInteger(slot)||slot<0||slot>=ship.cabins.length||ship.cabins[slot]!=='cannon') return fail('invalid');
+  const type=SHIP_TYPES[ship.type];
+  if (next.weight>type.maxGunWeight) return fail('cannonWeight',{weight:next.weight,max:type.maxGunWeight});
+  const current=ship.cannons?ship.cannons[slot]:type.defaultCannon;
+  if (current===cannonId) return fail('same');
+  if (state.gold<next.price) return fail('funds',{cost:next.price});
+  if (!ship.cannons) ship.cannons=ship.cabins.map(id=>id==='cannon'?type.defaultCannon:null);
+  state.gold-=next.price;
+  ship.cannons[slot]=cannonId;
+  return success(state,'armCannon',{ship:ship.name,slot:slot+1,name:next.name,cost:next.price});
 }
 export function upgrade(state,{shipId,upgrade}) {
   const ship=state.fleet.find(item=>item.id===shipId);

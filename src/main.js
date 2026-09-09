@@ -13,7 +13,7 @@ import { modal, guideDialog, settingsDialog, eventDialog, battleDialog, endingDi
 
 const loaded=loadGame();
 let state=loaded.state;
-const ui={view:'chart',facility:'market',selectedPort:state.voyage?.finalTarget||state.portId||'lisbon',selectedShip:state.fleet[0]?.id,cabinSlot:0,running:false,speed:1,mapBox:[0,0,1200,660]};
+const ui={view:'chart',facility:'market',selectedPort:state.voyage?.finalTarget||state.portId||'lisbon',selectedShip:state.fleet[0]?.id,cabinSlot:0,fleetTab:'ships',shipFilter:'all',cannonFilter:'all',inspectedShip:'first-rate',running:false,speed:1,mapBox:[0,0,1200,660]};
 const app=document.getElementById('app'),overlay=document.getElementById('overlay'),toastElement=document.getElementById('toast');
 const views={chart:renderChart,port:renderPort,fleet:renderFleet,cabins:renderCabins,crew:renderCrew,journal:renderJournal};
 let timer=null,toastTimer=null,controller=null,drag=null,suppressMapClick=false,endingSeen=false;
@@ -63,6 +63,7 @@ function perform(action,notify=true) {
   const result=dispatch(state,action);
   if(!result.ok){toast(result.message,true);return;}
   if(action.type==='depart'){ui.view='chart';ui.selectedPort=state.voyage.finalTarget;ui.running=true;}
+  if(action.type==='buyShip'){ui.fleetTab='owned';ui.selectedShip=state.fleet.at(-1).id;}
   if(!state.voyage||state.portId||state.event||state.combat||state.status==='lost')stopSailing();
   if(overlay.open)closeDialog();
   persist();render();
@@ -83,6 +84,10 @@ const actions={
   'select-ship':element=>{ui.selectedShip=element.dataset.shipId;ui.cabinSlot=0;render();},
   'ship-cabins':element=>{ui.selectedShip=element.dataset.shipId;ui.cabinSlot=0;changeView('cabins');},
   'cabin-slot':element=>{ui.cabinSlot=Number(element.dataset.slot);render();},
+  'fleet-tab':element=>{ui.fleetTab=element.dataset.tab;render();},
+  'ship-filter':element=>{ui.shipFilter=element.dataset.filter;render();},
+  'cannon-filter':element=>{ui.cannonFilter=element.dataset.filter;render();},
+  'inspect-ship':element=>{ui.inspectedShip=element.dataset.shipType;render();document.getElementById('ship-dossier')?.scrollIntoView({behavior:'instant',block:'start'});},
   game:element=>{
     const action={...element.dataset};delete action.action;
     if(action.slot!==undefined)action.slot=Number(action.slot);

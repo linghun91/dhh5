@@ -3,5 +3,5 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "scripts": { "start": "node scripts/serve.js" }
+  "scripts": { "start": "node scripts/serve.js", "test": "node scripts/verify-naval.js" }
 }

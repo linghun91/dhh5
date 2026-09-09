@@ -1,9 +1,9 @@
-import {PORTS,GOODS,CREW,CABINS,SHIP_TYPES,EQUIPMENT,SUPPLIES,ROLES} from '../data/catalog.js';
+import {PORTS,GOODS,CREW,CABINS,SHIP_TYPES,CANNONS,EQUIPMENT,SUPPLIES,ROLES} from '../data/catalog.js';
 import {getStats,regionProgress} from '../systems/stats.js';
 import {message} from '../data/messages.js';
 import {fail} from '../systems/common.js';
 import {contract,trade,supply,refill,refillPlan,invest} from '../systems/trade.js';
-import {createShip,buyShip,sellShip,hireSailors,cabin,upgrade,repair,repairCost} from '../systems/fleet.js';
+import {createShip,buyShip,sellShip,hireSailors,cabin,armCannon,upgrade,repair,repairCost} from '../systems/fleet.js';
 import {recruit,assign,buyEquipment,equip,rest,restCost} from '../systems/crew.js';
 import {availableQuests,acceptQuest,deliverQuest,explore,claimRelic,finish} from '../systems/quests.js';
 import {depart,step} from '../systems/navigation.js';
@@ -12,6 +12,7 @@ import {battle} from '../systems/combat.js';
 
 export {quote} from '../systems/trade.js';
 export {planRoute} from '../systems/navigation.js';
+export {getVolley} from '../systems/stats.js';
 
 export function createGame() {
   return {
@@ -23,9 +24,9 @@ export function createGame() {
     voyage:null,event:null,combat:null,logs:[{day:1,text:message('opening'),tone:'info'}]
   };
 }
-const portActions={contract,trade,supply,refill,hireSailors,rest,repair,buyShip,sellShip,cabin,upgrade,recruit,assign,buyEquipment,equip,invest,acceptQuest,deliverQuest,explore,claimRelic,finish,depart};
+const portActions={contract,trade,supply,refill,hireSailors,rest,repair,buyShip,sellShip,cabin,armCannon,upgrade,recruit,assign,buyEquipment,equip,invest,acceptQuest,deliverQuest,explore,claimRelic,finish,depart};
 const seaActions={step,eventChoice,battle};
-const catalogFields={targetId:PORTS,goodId:GOODS,crewId:CREW,cabinId:CABINS,shipType:SHIP_TYPES,equipmentId:EQUIPMENT,supplyId:SUPPLIES,role:ROLES};
+const catalogFields={targetId:PORTS,goodId:GOODS,crewId:CREW,cabinId:CABINS,shipType:SHIP_TYPES,cannonId:CANNONS,equipmentId:EQUIPMENT,supplyId:SUPPLIES,role:ROLES};
 export function dispatch(state,action) {
   if (state.status==='lost') return fail('lost');
   if (!action||typeof action.type!=='string') return fail('unknown');
