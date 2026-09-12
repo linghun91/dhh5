@@ -1,4 +1,5 @@
 import {CABINS,SHIP_TYPES,CANNONS,CREW,EQUIPMENT,PORTS,REGIONS} from '../data/catalog.js';
+import {CANNON_RANGE_FACTORS} from '../data/naval.js';
 import {cargoUsed,supplyUsed} from './common.js';
 
 export function shipStats(ship) {
@@ -13,11 +14,7 @@ export function shipStats(ship) {
 export function installedCannons(ship) {
   return ship.cabins.flatMap((id,slot)=>id==='cannon'?[CANNONS[ship.cannons?ship.cannons[slot]:SHIP_TYPES[ship.type].defaultCannon]]:[]).filter(Boolean);
 }
-export const RANGE_FACTORS={
-  long:{long:1.15,medium:1,close:.8},
-  medium:{long:.65,medium:1,close:1},
-  close:{long:.25,medium:.65,close:1.5}
-};
+export const RANGE_FACTORS=CANNON_RANGE_FACTORS;
 export function getVolley(state,range='medium') {
   const stats=getStats(state);
   const raw=state.fleet.reduce((sum,ship)=>sum+installedCannons(ship).reduce((power,cannon)=>power+cannon.firepower*(RANGE_FACTORS[cannon.range][range]??1),0),0);

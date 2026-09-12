@@ -1,10 +1,13 @@
 import assert from 'node:assert/strict';
+import {existsSync} from 'node:fs';
 import {createGame,dispatch,derive,getVolley} from '../src/core/game.js';
 import {parseSave,validateSave} from '../src/core/storage.js';
-import {SHIP_TYPES,CANNONS,CABINS} from '../src/data/catalog.js';
+import {SHIP_TYPES,CANNONS,CABINS,PORTS} from '../src/data/catalog.js';
+import {FACTIONS,PORT_FACTIONS,harborFleet,spawnEncounter,npcStats} from '../src/data/fleets.js';
 import {createShip} from '../src/systems/fleet.js';
 import {shipStats} from '../src/systems/stats.js';
 import {beginCombat} from '../src/systems/combat.js';
+import {random} from '../src/systems/common.js';
 
 let checks=0;
 const check=(name,fn)=>{fn();checks++;console.log(`✓ ${name}`);};
@@ -29,10 +32,19 @@ function combatWith(type='caravel') {
   return state;
 }
 
-check('All 12 hulls can be purchased, equipped and saved, including 16-slot flagships',()=>{
-  assert.equal(Object.keys(SHIP_TYPES).length,12);
-  assert.equal(Object.keys(CANNONS).length,8);
+check('The original twelve hulls keep their stats, and the expanded catalog can be purchased',()=>{
+  assert.ok(Object.keys(SHIP_TYPES).length>=60);
+  assert.ok(Object.keys(CANNONS).length>=60);
+  const families={exploration:0,merchant:0,war:0};
   for (const type of Object.values(SHIP_TYPES)) {
+    families[type.family]++;
+    assert.equal(type.cabins.length,type.slots,type.id);
+    assert.ok(type.sailors>=8,type.id);
+    assert.ok(CANNONS[type.defaultCannon].weight<=type.maxGunWeight,type.id);
+    assert.ok(existsSync(type.asset),type.asset);
+    assert.ok(type.masts>=1&&type.rig,type.id);
+    assert.equal(type.visual,type.id);
+    assert.equal(type.asset,`assets/ships/${type.id}.svg`);
     const state=createGame();state.gold=500000;
     act(state,{type:'buyShip',shipType:type.id});
     const ship=state.fleet[1];
@@ -42,9 +54,23 @@ check('All 12 hulls can be purchased, equipped and saved, including 16-slot flag
     assert.equal(validateSave(state),true,type.id);
     assert.deepEqual(parseSave(JSON.stringify(state)),state);
   }
+  assert.ok(families.exploration>=20&&families.merchant>=20&&families.war>=20,JSON.stringify(families));
+  for (const cannon of Object.values(CANNONS)) {
+    assert.ok(existsSync(cannon.asset),cannon.asset);
+    assert.equal(cannon.visual,cannon.id);
+    assert.equal(cannon.asset,`assets/cannons/${cannon.id}.svg`);
+  }
+  assert.equal(SHIP_TYPES.caravel.price,6500);
+  assert.equal(SHIP_TYPES.caravel.hull,160);
+  assert.equal(SHIP_TYPES.caravel.defaultCannon,'culverin');
+  assert.equal(SHIP_TYPES.sloop.price,4200);
+  assert.equal(SHIP_TYPES.brig.defaultCannon,'long-9');
   assert.equal(SHIP_TYPES['first-rate'].slots,16);
   assert.equal(SHIP_TYPES.frigate.rate,5);
   assert.equal(SHIP_TYPES.frigate.ratedGuns,38);
+  assert.equal(CANNONS['long-32'].price,2400);
+  assert.equal(CANNONS['carronade-32'].weight,3);
+  assert.equal(CANNONS.swivel.firepower,8);
 });
 
 check('Mixed batteries change range performance, boarding strength and ammunition',()=>{
@@ -199,6 +225,53 @@ check('Malformed, overweight and orphaned loadouts fail validation and import',(
     assert.throws(()=>parseSave(JSON.stringify(state)),/invalid-save/);
   }
   assert.throws(()=>parseSave(null),/invalid-save/);
+});
+
+check('Faction harbours, pirate dens and combat encounters use catalog ships',()=>{
+  assert.equal(Object.keys(PORT_FACTIONS).length,Object.keys(PORTS).length);
+  for (const port of Object.values(PORTS)) {
+    const harbor=harborFleet(port.id);
+    assert.ok(harbor.faction&&harbor.ships.length>=2,port.id);
+    for (const id of harbor.ships) assert.ok(SHIP_TYPES[id],`${port.id} ${id}`);
+  }
+  const state=createGame();
+  act(state,{type:'depart',targetId:'seville'});
+  const pirates=spawnEncounter(state,'pirates',random);
+  const navy=spawnEncounter(state,'navy',random);
+  const corsair=spawnEncounter(state,'corsair',random);
+  assert.equal(pirates.kind,'pirates');
+  assert.equal(navy.factionId,'portugal');
+  assert.equal(corsair.kind,'corsair');
+  assert.ok(pirates.ships.length>=1&&navy.ships.length>=1);
+  assert.ok(pirates.hull>=40&&navy.firepower>=6);
+  assert.notEqual(pirates.name,navy.name);
+  const london=createGame();london.portId='london';
+  act(london,{type:'depart',targetId:'amsterdam'});
+  const royal=spawnEncounter(london,'navy',random);
+  assert.equal(royal.factionId,'england');
+  assert.ok(royal.ships.includes('frigate')||SHIP_TYPES[royal.ships[0]].family==='war');
+  assert.ok(npcStats(['first-rate'],3).hull>npcStats(['sloop'],1).hull);
+});
+
+check('Combat records the opposing fleet and navy papers can avoid a fight',()=>{
+  const state=combatWith('caravel');
+  assert.ok(Array.isArray(state.combat.ships)&&state.combat.ships.length>=1);
+  assert.ok(SHIP_TYPES[state.combat.flagship]);
+  assert.equal(state.combat.kind,'pirates');
+  const papers=createGame();
+  papers.gold=500000;papers.reputation=40;
+  act(papers,{type:'depart',targetId:'seville'});
+  papers.event={id:'navy',toll:360,encounter:spawnEncounter(papers,'navy',random)};
+  act(papers,{type:'eventChoice',choiceId:'salute'});
+  assert.equal(papers.combat,null);
+  assert.ok(papers.reputation>=45);
+  const toll=createGame();
+  toll.gold=500000;
+  act(toll,{type:'depart',targetId:'seville'});
+  toll.event={id:'pirates',toll:520,encounter:spawnEncounter(toll,'pirates',random)};
+  act(toll,{type:'eventChoice',choiceId:'pay'});
+  assert.equal(toll.gold,500000-520);
+  assert.equal(toll.combat,null);
 });
 
 console.log(`${checks} naval integration checks passed.`);

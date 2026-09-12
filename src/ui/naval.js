@@ -1,8 +1,10 @@
 import { CANNONS, SHIP_TYPES } from '../data/catalog.js';
 import { art, escape, stat } from './components.js';
+import { RANGE_FACTORS } from '../systems/stats.js';
 
-export const FAMILIES = {all:'全部舰型',exploration:'探索快船',merchant:'远洋商船',cruiser:'巡航护卫',line:'战列与重舰'};
+export const FAMILIES = {all:'全部舰型',exploration:'探险船',merchant:'商船',war:'战舰'};
 export const RANGES = {long:'远程',medium:'中程',close:'近程'};
+export const CANNON_KINDS = {all:'全部火炮',light:'轻炮',early:'早期炮',long:'长炮',carronade:'卡隆炮',mortar:'臼炮榴弹'};
 export const WEIGHTS = {1:'轻型',2:'标准',3:'中型',4:'重型',5:'超重型'};
 export const rateLabel = ship => ship.rate ? `${['','一','二','三','四','五','六'][ship.rate]}级舰` : '非分级舰';
 export const cannonAt = (ship,slot) => ship.cabins[slot]==='cannon' ? CANNONS[ship.cannons?.[slot] || SHIP_TYPES[ship.type].defaultCannon] : null;
@@ -26,14 +28,19 @@ const shipSources={
   sloop:'https://www.rmg.co.uk/collections/objects/rmgc-object-133796',
   brig:'https://historicengland.org.uk/listing/the-list/list-entry/1451624'
 };
-export const shipSourceLink=ship=>`<a class="naval-source" href="${shipSources[ship.id]||'https://www.rmg.co.uk/stories/maritime-history/rated-navy-ships-17th-19th-centuries'}" target="_blank" rel="noreferrer">舰型与历史资料 ↗</a>`;
+export const shipSourceLink=ship=>`<a class="naval-source" href="${shipSources[ship.id]||shipSources[ship.visualFamily]||shipSources[ship.visual]||'https://www.rmg.co.uk/stories/maritime-history/rated-navy-ships-17th-19th-centuries'}" target="_blank" rel="noreferrer">舰型与历史资料 ↗</a>`;
+export const cannonSourceHref=cannon=>cannonSources[cannon.id]||cannonSources[cannon.visualFamily]||cannonSources[cannon.visual]||'https://www.rmg.co.uk/stories/maritime-history/what-was-carronade';
+
+export const progression = family => Object.values(SHIP_TYPES).filter(ship=>ship.family===family).sort((a,b)=>a.rank-b.rank||a.price-b.price);
+export const emptyCannons = '<p class="empty-state">此距离与门类组合暂无火炮。请选择其他筛选，或<button class="button outline tiny" data-action="reset-cannon-filters">显示全部火炮</button>。</p>';
 
 export function cannonFacts(cannon) {
-  return `<div class="cannon-facts">${stat('炮组火力',cannon.firepower)}${stat('优势距离',RANGES[cannon.range])}${stat('承重需求',WEIGHTS[cannon.weight])}</div><p class="small muted">弹药系数 ${cannon.ammoCost} / 炮组${cannon.boarding?` · 白刃支援 +${cannon.boarding}`:''}</p>`;
+  const factors=RANGE_FACTORS[cannon.range];
+  return `<div class="cannon-facts">${stat('炮组火力',cannon.firepower)}${stat('优势距离',RANGES[cannon.range])}${stat('承重需求',WEIGHTS[cannon.weight])}</div><p class="small muted">弹药系数 ${cannon.ammoCost} / 炮组 · 白刃支援 +${cannon.boarding}</p><div class="cannon-range-factors" aria-label="距离伤害倍率">${Object.entries(RANGES).map(([range,label])=>`<span>${label} <b>×${factors[range]}</b></span>`).join('')}</div>`;
 }
 
-export function cannonCard(cannon,action='',selected=false) {
-  return `<article class="cannon-card ${selected?'selected':''}"><div class="row spread"><span class="eyebrow">${escape(cannon.era)}</span><span class="badge ${cannon.range==='close'?'gold':'dim'}">${RANGES[cannon.range]}炮</span></div>${art(cannon.asset,cannon.name)}<h3>${escape(cannon.name)}</h3><p class="cannon-shot">${escape(cannon.shot)}</p><p class="cannon-description">${escape(cannon.description)}</p><a class="naval-source" href="${cannonSources[cannon.id]}" target="_blank" rel="noreferrer">馆藏与炮型资料 ↗</a>${cannonFacts(cannon)}${action}</article>`;
+export function cannonCard(cannon,action='',selected=false,inspected=false) {
+  return `<article class="cannon-card ${selected?'selected':''} ${inspected?'inspected':''}"><div class="row spread"><span class="eyebrow">${escape(cannon.era)}</span><span class="badge ${cannon.range==='close'?'gold':'dim'}">${RANGES[cannon.range]}炮</span></div>${art(cannon.asset,cannon.name)}<h3>${escape(cannon.name)}</h3><p class="cannon-shot">${escape(cannon.shot)}</p><p class="cannon-description">${escape(cannon.description)}</p><a class="naval-source" href="${cannonSourceHref(cannon)}" target="_blank" rel="noreferrer">馆藏与炮型资料 ↗</a>${cannonFacts(cannon)}${action}</article>`;
 }
 
 export function historyNotes() {

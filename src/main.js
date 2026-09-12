@@ -1,6 +1,7 @@
 import { createGame, dispatch, derive } from './core/game.js';
 import { loadGame, saveGame, parseSave, exportGame } from './core/storage.js';
 import { UI } from './data/ui.js';
+import { SHIP_TYPES, CANNONS } from './data/catalog.js';
 import { art, button, escape } from './ui/components.js';
 import { renderShell } from './ui/shell.js';
 import { renderChart } from './ui/views/chart.js';
@@ -13,7 +14,7 @@ import { modal, guideDialog, settingsDialog, eventDialog, battleDialog, endingDi
 
 const loaded=loadGame();
 let state=loaded.state;
-const ui={view:'chart',facility:'market',selectedPort:state.voyage?.finalTarget||state.portId||'lisbon',selectedShip:state.fleet[0]?.id,cabinSlot:0,fleetTab:'ships',shipFilter:'all',cannonFilter:'all',inspectedShip:'first-rate',running:false,speed:1,mapBox:[0,0,1200,660]};
+const ui={view:'chart',facility:'market',selectedPort:state.voyage?.finalTarget||state.portId||'lisbon',selectedShip:state.fleet[0]?.id,cabinSlot:0,fleetTab:'ships',shipFilter:'all',cannonFilter:'all',cannonKind:'all',inspectedShip:'first-rate',running:false,speed:1,mapBox:[0,0,1200,660]};
 const app=document.getElementById('app'),overlay=document.getElementById('overlay'),toastElement=document.getElementById('toast');
 const views={chart:renderChart,port:renderPort,fleet:renderFleet,cabins:renderCabins,crew:renderCrew,journal:renderJournal};
 let timer=null,toastTimer=null,controller=null,drag=null,suppressMapClick=false,endingSeen=false;
@@ -87,7 +88,17 @@ const actions={
   'fleet-tab':element=>{ui.fleetTab=element.dataset.tab;render();},
   'ship-filter':element=>{ui.shipFilter=element.dataset.filter;render();},
   'cannon-filter':element=>{ui.cannonFilter=element.dataset.filter;render();},
-  'inspect-ship':element=>{ui.inspectedShip=element.dataset.shipType;render();document.getElementById('ship-dossier')?.scrollIntoView({behavior:'instant',block:'start'});},
+  'cannon-kind':element=>{ui.cannonKind=element.dataset.kind;render();},
+  'reset-cannon-filters':()=>{ui.cannonFilter='all';ui.cannonKind='all';render();},
+  'inspect-cannon-loadout':element=>{
+    const cannon=CANNONS[element.dataset.cannonId];
+    const current=state.fleet.find(ship=>ship.id===ui.selectedShip)||state.fleet[0];
+    const suitable=ship=>SHIP_TYPES[ship.type].maxGunWeight>=cannon.weight&&ship.cabins.includes('cannon');
+    const ship=suitable(current)?current:state.fleet.find(suitable)||current;
+    Object.assign(ui,{selectedShip:ship.id,cabinSlot:Math.max(0,ship.cabins.indexOf('cannon')),inspectedCannon:cannon.id,cannonFilter:'all',cannonKind:'all'});
+    changeView('cabins');document.querySelector('.cannon-card.inspected')?.scrollIntoView({behavior:'instant',block:'center'});
+  },
+  'inspect-ship':element=>{ui.inspectedShip=element.dataset.shipType;if(ui.view!=='fleet')ui.shipFilter='all';ui.view='fleet';ui.fleetTab='ships';render();document.getElementById('ship-dossier')?.scrollIntoView({behavior:'instant',block:'start'});},
   game:element=>{
     const action={...element.dataset};delete action.action;
     if(action.slot!==undefined)action.slot=Number(action.slot);

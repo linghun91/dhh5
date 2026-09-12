@@ -26,7 +26,8 @@ export const CABINS = keyed([
   {id:'kitchen',name:'厨房',price:400,cargo:0,supply:0,firepower:0,marines:0,kitchen:1,medicine:0,description:'每艘设厨房的船使舰队粮食消耗降低，最多 40%。'},
   {id:'infirmary',name:'医务室',price:650,cargo:0,supply:0,firepower:0,marines:0,kitchen:0,medicine:1,description:'减少疾病伤亡，降低疲劳增长。'}
 ],'cabins');
-export {SHIP_TYPES,CANNONS,NAVAL_NOTES} from './naval.js';
+export {SHIP_TYPES,CANNONS,NAVAL_NOTES,RIG_LABELS} from './naval.js';
+export {FACTIONS,PORT_FACTIONS,CAPITALS,PIRATE_WATERS,factionOf,harborFleet,piratePressure,npcStats,spawnEncounter,buildEvent} from './fleets.js';
 export const CREW = keyed([
   {id:'alvaro',name:'阿尔瓦罗',title:'远征船长',portId:'lisbon',price:0,navigation:55,trade:38,combat:48,medicine:18,description:'继承旧海图的年轻船长，决心收集七海的航海信物。'},
   {id:'ines',name:'伊内斯',title:'星象领航员',portId:'lisbon',price:1200,navigation:78,trade:35,combat:23,medicine:30,description:'相信星辰与数字，一次次把船队带回正确航线。'},
@@ -50,7 +51,7 @@ export const FACILITIES = keyed([
   {id:'dock',name:'码头',description:'补充粮水、炮弹、维修材并招募水手。'},
   {id:'tavern',name:'酒馆',description:'休息，招募海员，购买航海装备。'},
   {id:'shipyard',name:'造船厂',description:'购买、维修与出售舰船，升级船帆和装甲。'},
-  {id:'palace',name:'总督府',description:'投资贸易份额，领取地区信物与远征荣誉。'},
+  {id:'palace',name:'总督府',description:'投资贸易份额，查看驻港海军编制，领取地区信物与远征荣誉。'},
   {id:'guild',name:'商人行会',description:'承接限期运货委托，赚取金钱与声望。'},
   {id:'ruins',name:'遗迹',description:'组织岸上探索，寻找七海信物的线索。'}
 ],'facilities');
@@ -63,7 +64,9 @@ export const SUPPLIES = keyed([
 export const ROLES = {captain:'船长',navigator:'领航员',accountant:'主计长',gunner:'炮术长',doctor:'船医'};
 export const EVENTS = {
   storm:{id:'storm',name:'暴风来袭',description:'乌云压低了天际，巨浪将拍向船舷。',asset:'assets/supplies/repair.svg',choices:[{id:'shelter',name:'降帆避风',description:'停航一天，少量船体损伤。'},{id:'brace',name:'加固迎浪',description:'消耗 3 维修材，大幅降低损伤。'}]},
-  pirates:{id:'pirates',name:'陌生黑帆',description:'一支海盗船驶入视野，号炮要求你交出过路费。',asset:'assets/ships/galleon.svg',choices:[{id:'fight',name:'准备迎战',description:'进入回合海战。'},{id:'pay',name:'支付通行费',description:'支付 450 金币，避免交火。'},{id:'evade',name:'全帆脱离',description:'领航能力决定逃脱机会，失败则进入战斗。'}]},
+  pirates:{id:'pirates',name:'陌生黑帆',description:'一支海盗船队升起黑旗，号炮要求你交出过路费。船型随海域变化。',asset:'assets/ships/galleon.svg',choices:[{id:'fight',name:'准备迎战',description:'进入回合海战。'},{id:'pay',name:'支付通行费',description:'按对方船队规模支付金币，避免交火。'},{id:'evade',name:'全帆脱离',description:'领航能力决定逃脱机会，失败则进入战斗。'}]},
+  navy:{id:'navy',name:'海军巡航分队',description:'当地势力的巡航舰升起旗号，要求临检文书与货舱。拒检会严重损害声望。',asset:'assets/ships/frigate.svg',choices:[{id:'salute',name:'出示文书',description:'声望至少 18 即可放行并获 5 声望；否则接受一天检查。'},{id:'inspect',name:'配合临检',description:'停航一天接受检查，消耗当日粮水，可免交费用。'},{id:'pay',name:'缴纳临检费',description:'支付金币，避免交火。'},{id:'fight',name:'拒检开战',description:'开战即损失 25 声望，获胜不返还。'},{id:'evade',name:'抢风逃脱',description:'成功损失 5 声望；失败进入海战并损失 25 声望。'}]},
+  corsair:{id:'corsair',name:'私掠船队',description:'持有或伪造许可证的猎手挡住航路，点名要货舱里最值钱的东西。',asset:'assets/ships/brig.svg',choices:[{id:'fight',name:'准备迎战',description:'进入回合海战。'},{id:'pay',name:'交出买路金',description:'按对方船队规模支付金币。'},{id:'evade',name:'全帆脱离',description:'领航能力决定逃脱机会，失败则进入战斗。'}]},
   castaway:{id:'castaway',name:'海上的求救',description:'一艘遇难渔船的幸存者挥舞着破旧的旗帜。',asset:'assets/crew/diego.svg',choices:[{id:'rescue',name:'救助幸存者',description:'消耗 5 粮水，获得声望与愿意加入的水手。'},{id:'leave',name:'送上祝福',description:'继续原定航线。'}]},
   salvage:{id:'salvage',name:'漂浮货箱',description:'海浪中出现几只仍然完好的密封货箱。',asset:'assets/goods/gold.svg',choices:[{id:'salvage',name:'打捞货箱',description:'水手疲劳 +5，找到一笔金币。'},{id:'leave',name:'保持航向',description:'继续原定航线。'}]},
   illness:{id:'illness',name:'船上疾病',description:'几名水手发烧倒下，必须决定应对办法。',asset:'assets/cabins/infirmary.svg',choices:[{id:'treat',name:'隔离护理',description:'消耗 4 食物；船医与医务室降低伤亡。'},{id:'endure',name:'压缩口粮休养',description:'增加疲劳并损失部分水手。'}]}

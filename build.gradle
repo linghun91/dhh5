@@ -19,7 +19,7 @@ tasks.register('verifyResources') {
 }
 
 tasks.register('verifyNaval', Exec) {
-    commandLine 'node', 'scripts/verify-naval.js'
+    commandLine 'node', 'scripts/verify.js'
 }
 
 tasks.register('site', Sync) {

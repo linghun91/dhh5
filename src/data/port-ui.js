@@ -12,4 +12,6 @@ export const PORT_UI = {
   noActiveQuests: '尚未承接委托。', deliverAt: '前往目的港交付',
   cargoLoad: '已用货舱',
   noCost: '—', separator: ' / ', percent: '%', plus: '+',
+  homeFleet: '母港旗舰分队', patrolFleet: '驻港巡防编制', pirateWaters: '附近海域常有海盗出没',
+  localBuilds: '本地擅长建造',
 };

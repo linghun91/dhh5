@@ -1,6 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 280" fill="none" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 280" fill="none" role="img" aria-labelledby="title desc" data-catalog-id="demi-cannon" data-kind="early">
 <title id="title">半加农炮</title>
-<desc id="desc">早期半加农炮类型：比蛇炮更粗短的青铜炮身、明显扩口、加强炮箍与装饰吊耳，配厚木炮床和实心轮；历史名称随时代地区变化。原创类型示意，不是固定 32 磅制炮复刻。</desc>
+<desc id="desc">早期火炮；早期重炮型号；中距；炮架承重等级 4；火力 29；每炮组弹耗系数 0.9。早期重型半加农炮，炮身较蛇炮粗短，以沉重弹丸破坏船体，需较强船体承重。 原创结构示意，不是比例工程图。</desc>
+<metadata id="naval-spec">{&quot;id&quot;:&quot;demi-cannon&quot;,&quot;name&quot;:&quot;半加农炮&quot;,&quot;kind&quot;:&quot;early&quot;,&quot;range&quot;:&quot;medium&quot;,&quot;weight&quot;:4,&quot;shot&quot;:&quot;早期重炮型号&quot;,&quot;firepower&quot;:29,&quot;ammoCost&quot;:0.9,&quot;boarding&quot;:2}</metadata>
 <defs>
   <linearGradient id="iron" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#17232c"/><stop offset=".13" stop-color="#7f8e91"/><stop offset=".28" stop-color="#b1b8b3"/><stop offset=".45" stop-color="#5d6c70"/><stop offset=".66" stop-color="#35464e"/><stop offset=".91" stop-color="#152631"/><stop offset="1" stop-color="#46565c"/></linearGradient>
   <linearGradient id="bronze" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#75623a"/><stop offset=".17" stop-color="#f2d893"/><stop offset=".32" stop-color="#cfb16a"/><stop offset=".58" stop-color="#977a41"/><stop offset=".84" stop-color="#4e5543"/><stop offset="1" stop-color="#8a794c"/></linearGradient>

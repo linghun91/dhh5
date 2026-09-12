@@ -1,4 +1,5 @@
-import { PORTS, REGIONS, GOODS, CREW, SUPPLIES, FACILITIES } from '../../data/catalog.js';
+import { PORTS, REGIONS, GOODS, CREW, SUPPLIES, FACILITIES, SHIP_TYPES } from '../../data/catalog.js';
+import { harborFleet, piratePressure } from '../../data/fleets.js';
 import { UI, text } from '../../data/ui.js';
 import { PORT_UI as P } from '../../data/port-ui.js';
 import { quote } from '../../core/game.js';
@@ -47,12 +48,22 @@ function renderTavern(state, derived) {
 }
 
 function renderShipyard(state, derived) {
-  return `${facilityHeading(UI.shipMarket, P.shipyardSub)}<div class="shipyard-feature">${art(FACILITIES.shipyard.asset, FACILITIES.shipyard.name)}<div><h3>${UI.fleetTitle}</h3><p class="muted">${P.shipyardHint}</p><div class="stats-grid">${stat(UI.fleetTitle, text('fleetCount', { n: state.fleet.length }))}${stat(UI.hull, ratio(derived.hull, derived.maxHull))}</div><div class="service-actions">${button(P.openFleet, 'view', { view: 'fleet' }, 'primary')}${button(P.openCabins, 'view', { view: 'cabins' })}${gameButton(`${UI.repairAll} · ${price(derived.repairCost)}`, 'repair', {}, '', state.gold < derived.repairCost || derived.hull >= derived.maxHull)}</div></div></div>`;
+  const harbor = harborFleet(state.portId);
+  const specialty = harbor.faction.specialty.map(id => SHIP_TYPES[id]).filter(Boolean);
+  return `${facilityHeading(UI.shipMarket, P.shipyardSub)}<div class="shipyard-feature">${art(FACILITIES.shipyard.asset, FACILITIES.shipyard.name)}<div><h3>${escape(harbor.faction.name)} · 本地船厂</h3><p class="muted">${escape(harbor.faction.blurb)} ${P.shipyardHint}</p><div class="stats-grid">${stat(UI.fleetTitle, text('fleetCount', { n: state.fleet.length }))}${stat(UI.hull, ratio(derived.hull, derived.maxHull))}</div><div class="service-actions">${button(P.openFleet, 'view', { view: 'fleet' }, 'primary')}${button(P.openCabins, 'view', { view: 'cabins' })}${gameButton(`${UI.repairAll} · ${price(derived.repairCost)}`, 'repair', {}, '', state.gold < derived.repairCost || derived.hull >= derived.maxHull)}</div></div></div>
+    ${sectionTitle(P.localBuilds)}<div class="encounter-fleet shipyard-builds">${specialty.map(ship => button(`${art(ship.asset, ship.name)}${escape(ship.name)} · ${price(ship.price)}`, 'inspect-ship', {'ship-type':ship.id}, 'outline tiny')).join('')}</div>`;
+}
+
+function fleetStrip(title, ships) {
+  return `<div class="harbor-fleet"><h3>${title}</h3><div class="encounter-fleet">${ships.map(id => button(`${art(SHIP_TYPES[id].asset, SHIP_TYPES[id].name)}${escape(SHIP_TYPES[id].name)}`, 'inspect-ship', {'ship-type':id}, 'outline tiny')).join('')}</div></div>`;
 }
 
 function renderPalace(state, derived) {
   const share = state.shares[state.portId] || 0;
-  return `${facilityHeading(UI.palaceTitle, UI.palaceSub)}<div class="palace-feature">${asset('facilities', 'palace', UI.palaceTitle)}<div class="share-panel"><h3>${UI.influence}</h3><div class="share-values"><span>${UI.yourShare} <strong class="gold">${share}${P.percent}</strong></span><span class="muted">${UI.otherShare} ${100 - share}${P.percent}</span></div>${meter(share, 100, 'gold-meter')}<p class="muted">${P.shareHint}</p><p class="small">${UI.investEffect}</p>${state.contracts[state.portId] ? gameButton(`${UI.invest} · ${price(derived.investCost)}`, 'invest', {}, 'primary', share >= 100 || state.gold < derived.investCost) : gameButton(`${UI.contract} · ${price(derived.contractCost)}`, 'contract', {}, 'primary', state.gold < derived.contractCost)}</div></div>`;
+  const harbor = harborFleet(state.portId);
+  const pirates = piratePressure(state.portId);
+  return `${facilityHeading(UI.palaceTitle, UI.palaceSub)}<div class="palace-feature">${asset('facilities', 'palace', UI.palaceTitle)}<div class="share-panel"><h3>${UI.influence}</h3><div class="share-values"><span>${UI.yourShare} <strong class="gold">${share}${P.percent}</strong></span><span class="muted">${UI.otherShare} ${100 - share}${P.percent}</span></div>${meter(share, 100, 'gold-meter')}<p class="muted">${P.shareHint}</p><p class="small">${UI.investEffect}</p>${state.contracts[state.portId] ? gameButton(`${UI.invest} · ${price(derived.investCost)}`, 'invest', {}, 'primary', share >= 100 || state.gold < derived.investCost) : gameButton(`${UI.contract} · ${price(derived.contractCost)}`, 'contract', {}, 'primary', state.gold < derived.contractCost)}</div></div>
+    ${sectionTitle(`${harbor.faction.asset?art(harbor.faction.asset,harbor.faction.name,'faction-flag'):''}${harbor.faction.navyName} · ${harbor.name}`)}${harbor.stats?`<div class="stats-grid">${stat('编制舰只',harbor.ships.length)}${stat('船队耐久',harbor.stats.maxHull)}${stat('船队水手',harbor.stats.maxSailors)}${stat('中距基础火力',harbor.stats.firepower)}</div>`:''}<p class="muted small">${escape(harbor.faction.blurb)}</p>${fleetStrip(harbor.capital ? P.homeFleet : P.patrolFleet, harbor.ships)}${pirates ? fleetStrip(P.pirateWaters, pirates.ships) : ''}`;
 }
 
 function questCard(quest, state, active) {
@@ -80,5 +91,7 @@ export function renderPort(state, derived, ui) {
   const port = PORTS[state.portId];
   const facility = ui.facility || 'market';
   const specialties = port.goods.map(id => `<span>${art(GOODS[id].asset, GOODS[id].name)}${escape(GOODS[id].name)}</span>`).join('');
-  return `${heading(UI.portTitle, UI.portSub, P.arrival)}<section class="port-scene panel">${art(port.asset, port.name, 'port-panorama')}<div class="port-scene-overlay"><p class="eyebrow">${escape(REGIONS[port.region].name)}</p><h2>${escape(port.name)}</h2><p>${escape(port.description)}</p><div class="port-specialties"><span class="small">${UI.specialties}</span>${specialties}</div></div><span class="port-status">${icon('anchor')}${UI.docked}</span></section><nav class="facility-nav" aria-label="${UI.facilities}">${Object.values(FACILITIES).map(item => button(`${art(item.asset, item.name)}<span>${item.name}</span>`, 'facility', { facility: item.id }, `facility-button ${facility === item.id ? 'active' : ''}`)).join('')}</nav><section class="facility-content panel">${renderFacility[facility](state, derived)}</section>`;
+  const harbor = harborFleet(port.id);
+  const pirates = piratePressure(port.id);
+  return `${heading(UI.portTitle, UI.portSub, P.arrival)}<section class="port-scene panel">${art(port.asset, port.name, 'port-panorama')}<div class="port-scene-overlay"><p class="eyebrow">${escape(REGIONS[port.region].name)} · ${escape(harbor.faction.name)}</p><h2>${escape(port.name)}</h2><p>${escape(port.description)}</p><p class="harbor-line">${escape(harbor.name)}：${harbor.ships.map(id => escape(SHIP_TYPES[id].name)).join(' · ')}${pirates ? ` · ${P.pirateWaters}` : ''}</p><div class="port-specialties"><span class="small">${UI.specialties}</span>${specialties}</div></div><span class="port-status">${icon('anchor')}${UI.docked}</span></section><nav class="facility-nav" aria-label="${UI.facilities}">${Object.values(FACILITIES).map(item => button(`${art(item.asset, item.name)}<span>${item.name}</span>`, 'facility', { facility: item.id }, `facility-button ${facility === item.id ? 'active' : ''}`)).join('')}</nav><section class="facility-content panel">${renderFacility[facility](state, derived)}</section>`;
 }

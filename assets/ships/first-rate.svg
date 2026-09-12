@@ -1,5 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 440" role="img" aria-labelledby="title desc">
-<title id="title">一级战列舰 · 100 炮</title><desc id="desc">三桅横帆；3层主炮甲板，象牙色帆布、收束索具、铜底及舰艉窗廊。原创矢量侧面插画；炮门数量为识别舰级的示意，非逐炮复原。</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 440" role="img" aria-labelledby="title desc" data-catalog-id="first-rate" data-family="war" data-rig="square" data-masts="3" data-gun-decks="3">
+<title id="title">一级战列舰</title>
+<desc id="desc">战舰；3 桅横帆；3 层主炮甲板；6 个游戏炮组；名义 100 炮。舰队旗舰 · 火力核心。原创矢量侧面示意，炮门数量与尺度不代表逐炮复原。</desc>
+<metadata id="naval-spec">{&quot;id&quot;:&quot;first-rate&quot;,&quot;name&quot;:&quot;一级战列舰&quot;,&quot;family&quot;:&quot;war&quot;,&quot;rank&quot;:50,&quot;masts&quot;:3,&quot;rig&quot;:&quot;square&quot;,&quot;gunDecks&quot;:3,&quot;ratedGuns&quot;:100,&quot;batterySlots&quot;:6,&quot;defaultCannon&quot;:&quot;long-32&quot;,&quot;maxGunWeight&quot;:5}</metadata>
 <defs>
  <linearGradient id="canvas" x1="0" y1="0" x2="1" y2=".8"><stop stop-color="#fff8de"/><stop offset=".43" stop-color="#ebdcb6"/><stop offset=".74" stop-color="#d3bd8b"/><stop offset="1" stop-color="#a98e62"/></linearGradient>
  <linearGradient id="canvasShade"><stop stop-color="#93816a" stop-opacity=".42"/><stop offset=".3" stop-color="#f3e8c9" stop-opacity="0"/><stop offset="1" stop-color="#fdf4d5" stop-opacity=".25"/></linearGradient>

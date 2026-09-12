@@ -1,4 +1,5 @@
 import {PORTS,EVENTS} from '../data/catalog.js';
+import {buildEvent,seaEventIds} from '../data/fleets.js';
 import {SEA_ROUTES} from '../data/world.js';
 import {MESSAGES,message} from '../data/messages.js';
 import {getStats,shipStats} from './stats.js';
@@ -81,8 +82,8 @@ export function step(state) {
     return success(state,'stopover',{port:PORTS[state.portId].name,target:PORTS[voyage.finalTarget].name,reason:continuation.message},'warn');
   }
   if (random(state)<.12) {
-    const ids=Object.keys(EVENTS);
-    state.event={id:ids[Math.floor(random(state)*ids.length)]};
+    const ids=seaEventIds(state,Object.keys(EVENTS));
+    state.event=buildEvent(state,ids[Math.floor(random(state)*ids.length)],random);
     return success(state,'event',{name:EVENTS[state.event.id].name},'warn');
   }
   return success(state,'sailDay',{day:voyage.days,weather:MESSAGES.weather[voyage.weather],distance:Math.round(distance*18)},'info');

@@ -1,6 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 280" fill="none" role="img" aria-labelledby="title desc">
-<title id="title">舷侧旋回炮</title>
-<desc id="desc">轻型青铜旋回炮：细炮管、后部操纵柄、U 形铁叉架与竖直旋转插销，固定在木质舷墙座上；没有轮式陆炮架。原创类型示意，轮廓参考馆藏前装滑膛旋回炮。</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 280" fill="none" role="img" aria-labelledby="title desc" data-catalog-id="swivel" data-kind="light">
+<title id="title">旋回小炮</title>
+<desc id="desc">轻型炮；小型散弹炮；近距；炮架承重等级 1；火力 8；每炮组弹耗系数 0.25。舷缘叉架上的轻型旋回炮，擅长近距离压制甲板与支援接舷，远射弱。 原创结构示意，不是比例工程图。</desc>
+<metadata id="naval-spec">{&quot;id&quot;:&quot;swivel&quot;,&quot;name&quot;:&quot;旋回小炮&quot;,&quot;kind&quot;:&quot;light&quot;,&quot;range&quot;:&quot;close&quot;,&quot;weight&quot;:1,&quot;shot&quot;:&quot;小型散弹炮&quot;,&quot;firepower&quot;:8,&quot;ammoCost&quot;:0.25,&quot;boarding&quot;:10}</metadata>
 <defs>
   <linearGradient id="iron" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#17232c"/><stop offset=".13" stop-color="#7f8e91"/><stop offset=".28" stop-color="#b1b8b3"/><stop offset=".45" stop-color="#5d6c70"/><stop offset=".66" stop-color="#35464e"/><stop offset=".91" stop-color="#152631"/><stop offset="1" stop-color="#46565c"/></linearGradient>
   <linearGradient id="bronze" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#75623a"/><stop offset=".17" stop-color="#f2d893"/><stop offset=".32" stop-color="#cfb16a"/><stop offset=".58" stop-color="#977a41"/><stop offset=".84" stop-color="#4e5543"/><stop offset="1" stop-color="#8a794c"/></linearGradient>

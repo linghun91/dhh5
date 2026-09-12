@@ -1,22 +1,35 @@
-import {PORTS,REGIONS} from '../data/catalog.js';
+import {PORTS,SHIP_TYPES,CANNONS} from '../data/catalog.js';
+import {spawnEncounter} from '../data/fleets.js';
 import {message} from '../data/messages.js';
-import {getStats,shipStats,getVolley} from './stats.js';
+import {getStats,shipStats,getVolley,RANGE_FACTORS} from './stats.js';
 import {random,fail,success,addLog,gainExperience} from './common.js';
 import {damageFleet,loseSailors,resolveLosses} from './time.js';
 
-export function beginCombat(state) {
-  const regionId=PORTS[state.voyage.from].region,danger=REGIONS[regionId].danger;
-  const hull=85+danger*30,sailors=20+danger*9;
-  state.combat={name:message('pirateName'),hull,maxHull:hull,sailors,maxSailors:sailors,firepower:9+danger*4,round:1,reward:750+danger*400,regionId,range:'medium'};
-  return success(state,'combatStart',{},'warn');
+export function beginCombat(state,encounter) {
+  if (!state.voyage||state.portId) return fail('notSailing');
+  if (state.combat||state.event) return fail('blocked');
+  const spec=encounter||spawnEncounter(state,'pirates',random);
+  const start=spec.kind==='navy'?'navyCombatStart':spec.kind==='corsair'?'corsairCombatStart':'combatStart';
+  state.combat={
+    name:spec.name,kind:spec.kind||'pirates',factionId:spec.factionId||'pirates',
+    ships:[...(spec.ships||['sloop'])],flagship:spec.flagship||spec.ships?.[0]||'sloop',
+    hull:spec.hull,maxHull:spec.maxHull??spec.hull,sailors:spec.sailors,maxSailors:spec.maxSailors??spec.sailors,
+    firepower:spec.firepower,round:1,reward:spec.reward,regionId:spec.regionId||PORTS[state.voyage.from].region,range:'medium',
+    gunRange:CANNONS[SHIP_TYPES[spec.flagship||spec.ships?.[0]||'sloop']?.defaultCannon]?.range||'medium'
+  };
+  if (spec.patrolPortId) state.combat.patrolPortId=spec.patrolPortId;
+  if (spec.firepowerByRange) state.combat.firepowerByRange={...spec.firepowerByRange};
+  if (spec.kind==='navy') state.reputation=Math.max(0,state.reputation-25);
+  return success(state,start,{name:spec.name},'warn');
 }
 function victory(state) {
   const gold=state.combat.reward,stats=getStats(state);
+  const navy=state.combat.kind==='navy';
   state.gold+=gold;
-  state.reputation+=25;
+  if (!navy) state.reputation+=25;
   state.battlesWon++;
   state.morale=Math.min(100,state.morale+8);
-  let free=stats.supplyCapacity-stats.supplyUsed;
+  let free=Math.max(0,stats.supplyCapacity-stats.supplyUsed);
   for (const id of ['food','water','ammo']) {
     const quantity=Math.min(free,4);
     state.supplies[id]+=quantity;
@@ -24,10 +37,11 @@ function victory(state) {
   }
   gainExperience(state,45);
   state.combat=null;
-  return success(state,'battleWin',{gold});
+  return success(state,navy?'navyBattleWin':'battleWin',{gold});
 }
 export function battle(state,{move}) {
   if (!state.combat) return fail('noCombat');
+  if (state.event) return fail('blocked');
   if (!['cannon','board','guard','flee','repair','approach','withdraw'].includes(move)) return fail('invalid');
   const range=state.combat.range||'medium',ranges=['close','medium','long'];
   const volley=getVolley(state,range);
@@ -84,7 +98,10 @@ export function battle(state,{move}) {
   if (state.status==='lost') return {ok:true,message:state.ending};
   if (enemy.hull<=0||enemy.sailors<=0) return victory(state);
   const armor=state.fleet.reduce((sum,ship)=>sum+ship.armor,0)/state.fleet.length;
-  const damage=Math.max(1,Math.round(enemy.firepower*(.8+random(state)*.4)*guard*(1-armor*.09)));
+  const returnRange=enemy.range||'medium';
+  const rangeFactor=RANGE_FACTORS[enemy.gunRange||'medium']?.[returnRange]??1;
+  const firepower=enemy.firepowerByRange?.[returnRange]??enemy.firepower*rangeFactor;
+  const damage=Math.max(1,Math.round(firepower*(.8+random(state)*.4)*guard*(1-armor*.09)));
   damageFleet(state,damage);
   if (state.status==='lost') return {ok:true,message:state.ending};
   state.fatigue=Math.min(100,state.fatigue+1);

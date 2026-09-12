@@ -1,5 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 440" role="img" aria-labelledby="title desc">
-<title id="title">单桅纵帆快船</title><desc id="desc">单桅斜桁纵帆、三角前帆与低矮快船船体。原创矢量侧面插画；炮门数量为识别舰级的示意，非逐炮复原。</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 440" role="img" aria-labelledby="title desc" data-catalog-id="sloop" data-family="war" data-rig="gaff" data-masts="1" data-gun-decks="1">
+<title id="title">单桅巡逻帆船</title>
+<desc id="desc">战舰；1 桅纵帆；1 层主炮甲板；1 个游戏炮组。快速侦察 · 近岸巡逻。原创矢量侧面示意，炮门数量与尺度不代表逐炮复原。</desc>
+<metadata id="naval-spec">{&quot;id&quot;:&quot;sloop&quot;,&quot;name&quot;:&quot;单桅巡逻帆船&quot;,&quot;family&quot;:&quot;war&quot;,&quot;rank&quot;:8,&quot;masts&quot;:1,&quot;rig&quot;:&quot;gaff&quot;,&quot;gunDecks&quot;:1,&quot;ratedGuns&quot;:0,&quot;batterySlots&quot;:1,&quot;defaultCannon&quot;:&quot;swivel&quot;,&quot;maxGunWeight&quot;:2}</metadata>
 <defs>
  <linearGradient id="canvas" x1="0" y1="0" x2="1" y2=".8"><stop stop-color="#fff8de"/><stop offset=".43" stop-color="#ebdcb6"/><stop offset=".74" stop-color="#d3bd8b"/><stop offset="1" stop-color="#a98e62"/></linearGradient>
  <linearGradient id="canvasShade"><stop stop-color="#93816a" stop-opacity=".42"/><stop offset=".3" stop-color="#f3e8c9" stop-opacity="0"/><stop offset="1" stop-color="#fdf4d5" stop-opacity=".25"/></linearGradient>

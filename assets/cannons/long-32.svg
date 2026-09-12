@@ -1,6 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 280" fill="none" role="img" aria-labelledby="title desc">
-<title id="title">32 磅重长炮</title>
-<desc id="desc">战列舰下层炮甲板的重型滑膛长炮：系列中最粗炮口、最厚后膛、宽炮箍与深木质炮架，配炮耳压板、实心小轮和制退绳。32 磅指弹重。原创类型示意，不是比例工程图。</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 280" fill="none" role="img" aria-labelledby="title desc" data-catalog-id="long-32" data-kind="long">
+<title id="title">32 磅长炮</title>
+<desc id="desc">舰用长短炮；32 磅实心弹；远距；炮架承重等级 5；火力 35；每炮组弹耗系数 1.15。大型战列舰下层炮甲板的重炮。最强远射火力之一，承重与弹耗需求也高。 原创结构示意，不是比例工程图。</desc>
+<metadata id="naval-spec">{&quot;id&quot;:&quot;long-32&quot;,&quot;name&quot;:&quot;32 磅长炮&quot;,&quot;kind&quot;:&quot;long&quot;,&quot;range&quot;:&quot;long&quot;,&quot;weight&quot;:5,&quot;shot&quot;:&quot;32 磅实心弹&quot;,&quot;firepower&quot;:35,&quot;ammoCost&quot;:1.15,&quot;boarding&quot;:0}</metadata>
 <defs>
   <linearGradient id="iron" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#17232c"/><stop offset=".13" stop-color="#7f8e91"/><stop offset=".28" stop-color="#b1b8b3"/><stop offset=".45" stop-color="#5d6c70"/><stop offset=".66" stop-color="#35464e"/><stop offset=".91" stop-color="#152631"/><stop offset="1" stop-color="#46565c"/></linearGradient>
   <linearGradient id="bronze" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#75623a"/><stop offset=".17" stop-color="#f2d893"/><stop offset=".32" stop-color="#cfb16a"/><stop offset=".58" stop-color="#977a41"/><stop offset=".84" stop-color="#4e5543"/><stop offset="1" stop-color="#8a794c"/></linearGradient>
